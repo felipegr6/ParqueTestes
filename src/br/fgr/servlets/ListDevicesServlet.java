@@ -11,16 +11,10 @@ import com.google.gson.Gson;
 
 import br.fgr.domain.Device;
 
-/**
- * Servlet implementation class ListDevicesServlet
- */
 @WebServlet("/ListDevicesServlet")
 public class ListDevicesServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
 	public ListDevicesServlet() {
 		super();
 	}

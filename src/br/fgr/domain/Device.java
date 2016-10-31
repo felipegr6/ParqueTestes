@@ -122,7 +122,6 @@ public class Device {
 							default:
 
 							}
-							System.out.println(l2);
 						}
 					}
 					devices.add(d);

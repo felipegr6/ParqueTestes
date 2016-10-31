@@ -15,31 +15,19 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-import br.fgr.domain.Executor;
-
-/**
- * Servlet implementation class UploadServlet
- */
 @WebServlet("/UploadServlet")
 public class UploadServlet extends HttpServlet {
+
 	private static final long serialVersionUID = 1L;
 	private static String UPLOAD_DIRECTORY = "";
 	private static final int THRESHOLD_SIZE = 1024 * 1024 * 3; // 3MB
 	private static final int MAX_FILE_SIZE = 1024 * 1024 * 40; // 40MB
 	private static final int MAX_REQUEST_SIZE = 1024 * 1024 * 50; // 50MB
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
 	public UploadServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		UPLOAD_DIRECTORY = String.valueOf(System.currentTimeMillis());
@@ -98,12 +86,24 @@ public class UploadServlet extends HttpServlet {
 			request.setAttribute("message", "Deu ruim.");
 		}
 
-		Executor executor = new Executor(UPLOAD_DIRECTORY);
-		executor.createScripts(uploadPath, "app.keystore", alias, password);
-		executor.genSkeleton();
-		executor.changeFilesLocation();
-		executor.resignApk();
-		executor.runTests();
+		request.setAttribute("dir", UPLOAD_DIRECTORY);
+		request.setAttribute("alias", alias);
+		request.setAttribute("password", password);
+
+		/*
+		 * Executor executor = new Executor(UPLOAD_DIRECTORY, new
+		 * OnCompletedOperation() {
+		 * 
+		 * @Override public void onSuccess() {
+		 * 
+		 * }
+		 * 
+		 * @Override public void onError(String messageError) {
+		 * 
+		 * } }); executor.createScripts(uploadPath, "app.keystore", alias,
+		 * password); executor.genSkeleton(); executor.changeFilesLocation();
+		 * executor.resignApk(); executor.runTests(uploadPath);
+		 */
 
 		getServletContext().getRequestDispatcher("/message.jsp").forward(request, response);
 	}

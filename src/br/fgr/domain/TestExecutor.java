@@ -4,20 +4,23 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 
 import com.google.gson.Gson;
 
-public class Executor {
+public class TestExecutor {
 
 	private String path;
+	private OnCompletedOperation callback;
 
-	public Executor(String path) {
+	public TestExecutor(String path, OnCompletedOperation callback) {
 		this.path = path;
-		System.out.println(path);
+		this.callback = callback;
 	}
 
 	// TODO: Example, remove when finishes.
@@ -84,8 +87,10 @@ public class Executor {
 			Process p3 = Runtime.getRuntime().exec(c3);
 			p3.waitFor();
 
+			callback.onSuccess("Create scripts");
 		} catch (Exception e) {
 			e.printStackTrace();
+			callback.onError(e.getMessage());
 		}
 	}
 
@@ -95,8 +100,16 @@ public class Executor {
 					String.format("(cd ../standalone/deployments/ParqueTestes.war/%s && exec .//gen.sh)", path) };
 			Process p = Runtime.getRuntime().exec(commands);
 			p.waitFor();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			StringBuffer sb = new StringBuffer();
+			while ((line = reader.readLine()) != null) {
+				sb.append(line + "\n");
+			}
+			callback.onSuccess(sb.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
+			callback.onError(e.getMessage());
 		}
 	}
 
@@ -106,8 +119,11 @@ public class Executor {
 					String.format("(cd ../standalone/deployments/ParqueTestes.war/%s && exec .//move.sh)", path) };
 			Process p = Runtime.getRuntime().exec(commands);
 			p.waitFor();
+
+			callback.onSuccess("Change files location.");
 		} catch (Exception e) {
 			e.printStackTrace();
+			callback.onError(e.getMessage());
 		}
 	}
 
@@ -117,12 +133,18 @@ public class Executor {
 					String.format(
 							"(cd ../standalone/deployments/ParqueTestes.war/%s && exec calabash-android resign apkFile.apk apkFile.apk)",
 							path) };
-			for (String s : commands)
-				System.out.println(s);
 			Process p = Runtime.getRuntime().exec(commands);
 			p.waitFor();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			StringBuffer sb = new StringBuffer();
+			while ((line = reader.readLine()) != null) {
+				sb.append(line + "\n");
+			}
+			callback.onSuccess(sb.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
+			callback.onError(e.getMessage());
 		}
 	}
 
@@ -131,22 +153,36 @@ public class Executor {
 		// -avd Device_Kitkat_API_19
 	}
 
-	public void runTests() {
+	public void runTests(String pathScript) {
 		// calabash-android run <out.apk> --verbose
 		try {
-			StringBuffer sb = new StringBuffer();
-			String commands[] = new String[] { "/bin/bash", "-c",
-					String.format("(cd ../standalone/deployments/ParqueTestes.war/%s && exec .//run.sh)", path) };
-			Process p = Runtime.getRuntime().exec(commands);
-			p.waitFor();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line = "";
-			while ((line = reader.readLine()) != null) {
-				sb.append(line + "\n");
+			List<Device> devices = Device.getDevices();
+			for (Device d : devices) {
+				StringBuffer sb = new StringBuffer();
+				String commands[] = new String[] { "/bin/bash", "-c",
+						String.format(
+								"(cd ../standalone/deployments/ParqueTestes.war/%s && export ADB_DEVICE_ARG=%s && exec .//run.sh)",
+								path, d.getSerial()) };
+				Process p = Runtime.getRuntime().exec(commands);
+				p.waitFor();
+				BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				String line = "";
+				while ((line = reader.readLine()) != null) {
+					sb.append(line + "\n");
+				}
+				System.out.println(sb.toString());
+				List<String> testContent = Arrays.asList(sb.toString());
+				Path testFile = Paths.get(String.format("%s/%s.log", pathScript, d.getSerial()));
+				if (Files.exists(testFile, new LinkOption[] { LinkOption.NOFOLLOW_LINKS })) {
+					Files.write(testFile, testContent, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
+				} else {
+					Files.write(testFile, testContent, Charset.forName("UTF-8"));
+				}
+				callback.onSuccess(sb.toString());
 			}
-			System.out.println(sb.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
+			callback.onError(e.getMessage());
 		}
 	}
 }
