@@ -1,0 +1,8 @@
+<web-app>
+
+    <display-name>Parque de Testes</display-name>
+    <welcome-file-list>
+        <welcome-file>upload.jsp</welcome-file>
+    </welcome-file-list>
+
+</web-app>
