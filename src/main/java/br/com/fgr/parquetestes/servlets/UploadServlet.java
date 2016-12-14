@@ -28,13 +28,13 @@ public class UploadServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
         UPLOAD_DIRECTORY = String.valueOf(System.currentTimeMillis());
         processRequest(request, response);
     }
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
         if (!ServletFileUpload.isMultipartContent(request)) {
             PrintWriter printWriter = response.getWriter();
             printWriter.println("Não contém dados.");
@@ -65,18 +65,21 @@ public class UploadServlet extends HttpServlet {
             List<FileItem> formItems = upload.parseRequest(request);
             for (FileItem item : formItems) {
                 if (!item.isFormField()) {
-                    if (item.getName().isEmpty())
+                    if (item.getName().isEmpty()) {
                         continue;
+                    }
                     String fileName = new File(item.getFieldName()).getName();
                     String filePath = uploadPath + File.separator + fileName;
                     File storeFile = new File(filePath);
                     // saves the file on disk
                     item.write(storeFile);
                 } else {
-                    if (item.getFieldName().equals("pwd"))
+                    if (item.getFieldName().equals("pwd")) {
                         password = item.getString();
-                    if (item.getFieldName().equals("alias"))
+                    }
+                    if (item.getFieldName().equals("alias")) {
                         alias = item.getString();
+                    }
                 }
             }
             request.setAttribute("message", "Upload feito com sucesso.");

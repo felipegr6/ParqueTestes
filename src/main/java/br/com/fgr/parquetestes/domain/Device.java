@@ -85,21 +85,27 @@ public class Device {
                     d.setSerial(line.split("\t")[0]);
 
                     String prefixCommand = String.format("adb -s %s shell getprop", d.getSerial());
-                    String commands[] = new String[]{
-                            String.format("%s %s", prefixCommand, CommandsEnum.DISPLAY.getCommand()),
-                            String.format("%s %s", prefixCommand, CommandsEnum.EMULATOR.getCommand()),
-                            String.format("%s %s", prefixCommand, CommandsEnum.FINGERPRINT.getCommand()),
-                            String.format("%s %s", prefixCommand, CommandsEnum.HARDWARE_SKU.getCommand()),
-                            String.format("%s %s", prefixCommand, CommandsEnum.RELEASE.getCommand()),
-                            String.format("%s %s", prefixCommand, CommandsEnum.SDK.getCommand())};
+                    String commands[] = new String[] {
+                        String.format("%s %s", prefixCommand, CommandsEnum.DISPLAY.getCommand()),
+                        String.format("%s %s", prefixCommand, CommandsEnum.EMULATOR.getCommand()),
+                        String.format("%s %s", prefixCommand,
+                            CommandsEnum.FINGERPRINT.getCommand()),
+                        String.format("%s %s", prefixCommand,
+                            CommandsEnum.HARDWARE_SKU.getCommand()),
+                        String.format("%s %s", prefixCommand, CommandsEnum.RELEASE.getCommand()),
+                        String.format("%s %s", prefixCommand, CommandsEnum.SDK.getCommand())};
 
                     for (String s : commands) {
-                        Process p2 = Runtime.getRuntime().exec(new String[]{"/bin/bash", "-c", s});
-                        BufferedReader r2 = new BufferedReader(new InputStreamReader(p2.getInputStream()));
+                        Process p2 = Runtime.getRuntime().exec(new String[] {"/bin/bash", "-c", s});
+                        BufferedReader r2 =
+                            new BufferedReader(new InputStreamReader(p2.getInputStream()));
                         String l2 = "";
                         while ((l2 = r2.readLine()) != null) {
                             switch (CommandsEnum
-                                    .getType(s.replace(String.format("adb -s %s shell getprop ", d.getSerial()), ""))) {
+                                .getType(
+                                    s.replace(
+                                        String.format("adb -s %s shell getprop ", d.getSerial()),
+                                        ""))) {
                                 case DISPLAY:
                                     d.setDisplay(l2);
                                     break;
@@ -119,7 +125,6 @@ public class Device {
                                     d.setVersion(l2);
                                     break;
                                 default:
-
                             }
                         }
                     }

@@ -28,14 +28,14 @@ public class TestServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
         final AsyncContext asyncContext = request.startAsync(request, response);
         asyncContext.setTimeout(10 * 60 * 1000);
         addToWaitingList(asyncContext);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
 
         String uploadDirectory = request.getParameter("dir");
         String alias = request.getParameter("alias");
@@ -44,18 +44,18 @@ public class TestServlet extends HttpServlet {
 
         new Thread(() -> {
             if (!uploadDirectory.isEmpty()) {
-                TestExecutor executor = new TestExecutor(uploadDirectory, new OnCompletedOperation() {
+                TestExecutor executor =
+                    new TestExecutor(uploadDirectory, new OnCompletedOperation() {
+                        @Override
+                        public void onSuccess(String message) {
+                            sendMessage(message);
+                        }
 
-                    @Override
-                    public void onSuccess(String message) {
-                        sendMessage(message);
-                    }
-
-                    @Override
-                    public void onError(String messageError) {
-                        sendMessage(messageError);
-                    }
-                });
+                        @Override
+                        public void onError(String messageError) {
+                            sendMessage(messageError);
+                        }
+                    });
                 executor.createScripts(uploadPath, "app.keystore", alias, password);
                 executor.genSkeleton();
                 executor.changeFilesLocation();
@@ -80,5 +80,4 @@ public class TestServlet extends HttpServlet {
             }
         });
     }
-
 }

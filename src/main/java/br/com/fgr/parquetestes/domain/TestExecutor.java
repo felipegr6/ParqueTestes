@@ -40,7 +40,7 @@ public class TestExecutor {
         try {
             // --------------------------------------------------------------------------------
             List<String> genContent = Arrays.asList("echo -ne '\\n' | calabash-android gen",
-                    "rm -f features/my_first.feature");
+                "rm -f features/my_first.feature");
             Path genFile = Paths.get(pathScript + "/gen.sh");
             Files.write(genFile, genContent, Charset.forName("UTF-8"));
 
@@ -57,7 +57,7 @@ public class TestExecutor {
             Files.write(moveFile, moveContent, Charset.forName("UTF-8"));
 
             List<String> setupContent = Arrays
-                    .asList(new Gson().toJson(new CalabashSettings(location, password, alias)));
+                .asList(new Gson().toJson(new CalabashSettings(location, password, alias)));
             Path setupFile = Paths.get(pathScript + "/.calabash_settings");
             Files.write(setupFile, setupContent, Charset.forName("UTF-8"));
 
@@ -67,18 +67,24 @@ public class TestExecutor {
 
             // --------------------------------------------------------------------------------
 
-            String c1[] = new String[]{"/bin/bash", "-c",
-                    String.format("(cd ../standalone/deployments/ParqueTestes.war/%s && exec chmod +x gen.sh)", path)};
+            String c1[] = new String[] {"/bin/bash", "-c",
+                String.format(
+                    "(cd ../standalone/deployments/ParqueTestes.war/%s && exec chmod +x gen.sh)",
+                    path)};
             Process p1 = Runtime.getRuntime().exec(c1);
             p1.waitFor();
 
-            String c2[] = new String[]{"/bin/bash", "-c", String
-                    .format("(cd ../standalone/deployments/ParqueTestes.war/%s && exec chmod +x move.sh)", path)};
+            String c2[] = new String[] {"/bin/bash", "-c", String
+                .format(
+                "(cd ../standalone/deployments/ParqueTestes.war/%s && exec chmod +x move.sh)",
+                path)};
             Process p2 = Runtime.getRuntime().exec(c2);
             p2.waitFor();
 
-            String c3[] = new String[]{"/bin/bash", "-c",
-                    String.format("(cd ../standalone/deployments/ParqueTestes.war/%s && exec chmod +x run.sh)", path)};
+            String c3[] = new String[] {"/bin/bash", "-c",
+                String.format(
+                    "(cd ../standalone/deployments/ParqueTestes.war/%s && exec chmod +x run.sh)",
+                    path)};
             Process p3 = Runtime.getRuntime().exec(c3);
             p3.waitFor();
 
@@ -91,8 +97,10 @@ public class TestExecutor {
 
     public void genSkeleton() {
         try {
-            String commands[] = new String[]{"/bin/bash", "-c",
-                    String.format("(cd ../standalone/deployments/ParqueTestes.war/%s && exec .//gen.sh)", path)};
+            String commands[] = new String[] {"/bin/bash", "-c",
+                String.format(
+                    "(cd ../standalone/deployments/ParqueTestes.war/%s && exec .//gen.sh)",
+                    path)};
             Process p = Runtime.getRuntime().exec(commands);
             p.waitFor();
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -110,8 +118,10 @@ public class TestExecutor {
 
     public void changeFilesLocation() {
         try {
-            String commands[] = new String[]{"/bin/bash", "-c",
-                    String.format("(cd ../standalone/deployments/ParqueTestes.war/%s && exec .//move.sh)", path)};
+            String commands[] = new String[] {"/bin/bash", "-c",
+                String.format(
+                    "(cd ../standalone/deployments/ParqueTestes.war/%s && exec .//move.sh)",
+                    path)};
             Process p = Runtime.getRuntime().exec(commands);
             p.waitFor();
 
@@ -124,10 +134,10 @@ public class TestExecutor {
 
     public void resignApk() {
         try {
-            String commands[] = new String[]{"/bin/bash", "-c",
-                    String.format(
-                            "(cd ../standalone/deployments/ParqueTestes.war/%s && exec calabash-android resign apkFile.apk apkFile.apk)",
-                            path)};
+            String commands[] = new String[] {"/bin/bash", "-c",
+                String.format(
+                    "(cd ../standalone/deployments/ParqueTestes.war/%s && exec calabash-android resign apkFile.apk apkFile.apk)",
+                    path)};
             Process p = Runtime.getRuntime().exec(commands);
             p.waitFor();
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -154,13 +164,14 @@ public class TestExecutor {
             List<Device> devices = Device.getDevices();
             for (Device d : devices) {
                 StringBuffer sb = new StringBuffer();
-                String commands[] = new String[]{"/bin/bash", "-c",
-                        String.format(
-                                "(cd ../standalone/deployments/ParqueTestes.war/%s && export ADB_DEVICE_ARG=%s && exec .//run.sh)",
-                                path, d.getSerial())};
+                String commands[] = new String[] {"/bin/bash", "-c",
+                    String.format(
+                        "(cd ../standalone/deployments/ParqueTestes.war/%s && export ADB_DEVICE_ARG=%s && exec .//run.sh)",
+                        path, d.getSerial())};
                 Process p = Runtime.getRuntime().exec(commands);
                 p.waitFor();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(p.getInputStream()));
                 String line = "";
                 while ((line = reader.readLine()) != null) {
                     sb.append(line + "\n");
@@ -168,8 +179,9 @@ public class TestExecutor {
                 System.out.println(sb.toString());
                 List<String> testContent = Arrays.asList(sb.toString());
                 Path testFile = Paths.get(String.format("%s/%s.log", pathScript, d.getSerial()));
-                if (Files.exists(testFile, new LinkOption[]{LinkOption.NOFOLLOW_LINKS})) {
-                    Files.write(testFile, testContent, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
+                if (Files.exists(testFile, new LinkOption[] {LinkOption.NOFOLLOW_LINKS})) {
+                    Files.write(testFile, testContent, Charset.forName("UTF-8"),
+                        StandardOpenOption.APPEND);
                 } else {
                     Files.write(testFile, testContent, Charset.forName("UTF-8"));
                 }

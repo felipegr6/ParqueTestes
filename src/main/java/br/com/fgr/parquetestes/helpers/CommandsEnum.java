@@ -2,8 +2,8 @@ package br.com.fgr.parquetestes.helpers;
 
 public enum CommandsEnum {
     HARDWARE_SKU("ro.boot.hardware.sku"), FINGERPRINT("ro.bootimage.build.fingerprint"), DISPLAY(
-            "ro.product.display"), RELEASE("ro.build.version.release"), SDK(
-            "ro.build.version.sdk"), EMULATOR("ro.setupwizard.mode"), ERROR("");
+        "ro.product.display"), RELEASE("ro.build.version.release"), SDK(
+        "ro.build.version.sdk"), EMULATOR("ro.setupwizard.mode"), ERROR("");
 
     private String command;
 
